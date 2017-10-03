@@ -1,11 +1,19 @@
 extends layout
 
 block content
-<h1>New Book</h1>
-<form>
-<p> <label for="title">Title</label><input id="title" type="text"></p>
-<p><label for="author">Author</label><input id="author" type="text"></p>
-<p><label for="genre">Genre</label><input id="genre" type="text"></p>
-<p><label for="first_published">First Published</label><input id="first_published" type="text"></p>
-<p><input type="submit" value="Create New Book"></p>
-</form>
+h1 New Book
+form
+    p
+        label(for='title') Title
+        input#title(type='text')
+    p
+        label(for='author') Author
+        input#author(type='text')
+    p
+        label(for='genre') Genre
+        input#genre(type='text')
+    p
+        label(for='first_published') First Published
+        input#first_published(type='text')
+    p
+        input(type='submit', value='Create New Book')

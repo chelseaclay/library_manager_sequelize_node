@@ -1,14 +1,23 @@
 {
   "development": {
-    "storage": "development.db",
-    "dialect": "sqlite"
+    "storage": "library.db",
+    "dialect": "sqlite",
+    "define": {
+      "timestamps": false
+    }
   },
   "test": {
     "storage": "test.db",
-    "dialect": "sqlite"
+    "dialect": "sqlite",
+    "define": {
+      "timestamps": false
+    }
   },
   "production": {
     "storage": "production.db",
-    "dialect": "sqlite"
+    "dialect": "sqlite",
+    "define": {
+      "timestamps": false
+    }
   }
 }
