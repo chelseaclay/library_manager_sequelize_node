@@ -10,8 +10,8 @@ module.exports = function(sequelize, DataTypes) {
     });
 
     Book.associate = function(models) {
-        // associations can be defined here
-        //Books.hasOne(models.Loans, { foreignKey: "book_id" });
+        Book.hasOne(models.Loan, { foreignKey: "book_id" });
+        Book.hasOne(models.Patron, { foreignKey: "book_id" });
     };
 
     return Book;

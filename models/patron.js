@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function(sequelize, DataTypes) {
-    const Patrons = sequelize.define("Patrons", {
+    const Patron = sequelize.define("Patron", {
         id: DataTypes.INTEGER,
         first_name: DataTypes.STRING,
         last_name: DataTypes.STRING,
@@ -11,9 +11,9 @@ module.exports = function(sequelize, DataTypes) {
         zip_code: DataTypes.INTEGER
     });
 
-    Patrons.associate = function(models) {
-        Patrons.hasMany(models.Task);
+    Patron.associate = function(models) {
+        Patron.hasMany(models.Loan, { foreignKey: "patron_id" });
     };
 
-    return Patrons;
+    return Patron;
 };
