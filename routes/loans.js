@@ -5,7 +5,7 @@ const Book = require('../models').Book;
 const Loan = require('../models').Loan;
 const Patron = require('../models').Patron;
 
-/* GET all laons */
+/* GET all loans */
 router.get('/', function(req, res) {
     Loan.findAll({
         include: [
@@ -19,7 +19,7 @@ router.get('/', function(req, res) {
         });
     });
 });
-/* GET checked laons */
+/* GET checked loans */
 router.get('/checked_loans', function(req, res) {
     Loan.findAll({
         include: [

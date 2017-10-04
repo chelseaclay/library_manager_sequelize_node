@@ -1,40 +1,44 @@
 extends layout
 
 block content
-    h1 Book: #{title}
-    form
-        p
-            label(for='title') Title
-            input#title(type='text', value=title)
-        p
-            label(for='author') Author
-            input#author(type='text', value=author)
-        p
-            label(for='genre') Genre
-            input#genre(type='text', value=genre)
-        p
-            label(for='first_published') First Published
-            input#first_published(type='text', value=first_published)
-        p
-            input(type='submit', value='Update')
-    h2 Loan History
-    table
-        thead
-            tr
-                th Book
-                th Patron
-                th Loaned on
-                th Return by
-                th Returned on
-                th Action
-        tbody
-            tr
-                td
-                    a(href='book_detail.html')
-                td
-                    a(href='patron_detail.html')
-                td
-                td 2015-12-19
-                td
-                td
-                    a.button(href='return_book.html') Return Book
+    if book
+        h1 Book: #{book.title}
+        form
+            p
+                label(for='title') Title
+                input#title(type='text', value=book.title)
+            p
+                label(for='author') Author
+                input#author(type='text', value=book.author)
+            p
+                label(for='genre') Genre
+
+                input#genre(type='text', value=book.genre)
+            p
+                label(for='first_published') First Published
+                input#first_published(type='text', value=book.first_published)
+            p
+                input(type='submit', value='Update')
+        if loans
+            h2 Loan History
+            table
+                thead
+                    tr
+                        th Book
+                        th Patron
+                        th Loaned on
+                        th Return by
+                        th Returned on
+                        th Action
+                tbody
+                    each loan in loans
+                        tr
+                            td
+                                a(href='book_detail.html') #{book.title}
+                            td
+                                a(href='patron_detail.html')
+                            td #{loan.loaned_on}
+                            td #{loan.return_by}
+                            td
+                            td
+                                a.button(href='return_book.html') Return Book

@@ -11,7 +11,6 @@ module.exports = function(sequelize, DataTypes) {
 
     Book.associate = function(models) {
         Book.hasOne(models.Loan, { foreignKey: "book_id" });
-        Book.hasOne(models.Patron, { foreignKey: "book_id" });
     };
 
     return Book;

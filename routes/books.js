@@ -57,7 +57,7 @@ router.get('/checked_books', function(req, res) {
     });
 });
 
-/* GET add new book form */
+/* GET add new book form */ //TODO NOT WORKING YET
 router.get('/new_book', (req, res) =>{
     res.render('new_book', {
                 heading: 'New Books',
@@ -78,22 +78,29 @@ router.post('/new_book', (req, res, next) =>{
         })
 
 });
-/* GET details of book */
+/* GET details of book */ //TODO ADD LOAN DETAILS
 router.get('/:id', (req, res) =>{
-    Book.findOne({
+    const getBook = Book.findOne({
         where: [
-            { id: req.params.id}
+            { id: req.params.id }
         ]
-    })
-        .then((book) => {
-            res.render('book_detail', {
-                title: book.title,
-                genre: book.genre,
-                author: book.author,
-                first_published: book.first_published
-            });
+    });
 
+    const getLoans = Loan.findAll({
+        where: [
+            { book_id: req.params.id }
+        ],
+        include: [{
+            model: Patron
+        }],
+    });
+
+    Promise.all([getBook, getLoans]).then(results => {
+        res.render('book_detail', {
+            book: results[0],
+            loans: results[1]
         });
+    });
 });
 
 
