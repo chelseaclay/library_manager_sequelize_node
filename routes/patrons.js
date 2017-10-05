@@ -14,7 +14,7 @@ router.get('/', (req, res) =>{
     });
 });
 
-/* GET add new patron form */
+/* ADD new patron form */
 router.get('/new_patron', (req, res) =>{
     res.render('new_patron', {
         heading: 'New Patron',
@@ -54,7 +54,6 @@ router.post('/new_patron', (req, res, next) =>{
 
     }).catch((error) => {
         res.status(500).send(error);
-        console.log(error)
     })
 
 });
