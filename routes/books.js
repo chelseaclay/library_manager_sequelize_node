@@ -65,19 +65,27 @@ router.get('/new_book', (req, res) =>{
             });
 });
 
-/* add new book */
+/* ADD new book */
 router.post('/new_book', (req, res, next) =>{
     Book.create(req.body)
         .then((book) =>{
-            res.redirect("../books/");
-        }).catch(function(error){
+            res.redirect("../books");
+        }).catch((error) => {
         if(error.name === "SequelizeValidationError") {
-            res.render("../books/new_book", {book: Book.build(req.body), errors: error.errors, heading: "New Book"})
+            res.render("new_book", {
+                title: req.body.title,
+                author: req.body.author,
+                genre: req.body.genre,
+                first_published: req.body.first_published,
+                errors: error.errors,
+                heading: "New Book Missing Info"
+            })
         } else {
             throw error;
         }
     }).catch((error) => {
             res.status(500).send(error);
+            console.log(error)
         })
 
 });

@@ -2,7 +2,11 @@ extends layout
 
 block content
     h1 #{heading}
-    form(method='post', action='')
+    if errors
+        ul
+            each error in errors
+                li= error.message
+    form(method='post', action='../books/new_book')
         p
             label(for='title') Title
             input#title(type='text' name='title', value=title)
@@ -17,7 +21,3 @@ block content
             input#first_published(type='text' name='first_published', value=first_published)
         p
             input(type='submit', value='Create New Book')
-    if errors
-        ul
-            for error in errors
-                li!= error.msg
