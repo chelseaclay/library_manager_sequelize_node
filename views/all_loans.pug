@@ -1,9 +1,9 @@
 extends layout
 
 block content
-    h1 #{title}
+    h1 #{heading}
     p
-        a.button(href='new_loan.html') Create New Loan
+        a.button(href='new_loan') Create New Loan
     p
         | Filters
         a(href='../loans')  All
@@ -32,4 +32,4 @@ block content
                     td #{loan.returned_on}
                     td
                         if(!loan.returned_on)
-                            a.button(href='return_book.html') Return Book
+                            a.button(href='return_book') Return Book

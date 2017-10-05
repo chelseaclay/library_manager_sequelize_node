@@ -58,31 +58,41 @@ router.get('/checked_books', function(req, res) {
     });
 });
 
-/* GET add new book form */ //TODO NOT WORKING YET
+/* GET add new book form */
 router.get('/new_book', (req, res) =>{
     res.render('new_book', {
-                heading: 'New Books',
+                heading: 'New Book',
             });
 });
 
-/* ADD new book */
+/* ADD new book - checks for errors carries over values to new rendered page */
 router.post('/new_book', (req, res, next) =>{
     Book.create(req.body)
         .then((book) =>{
             res.redirect("../books");
         }).catch((error) => {
-        if(error.name === "SequelizeValidationError") {
-            res.render("new_book", {
-                title: req.body.title,
-                author: req.body.author,
-                genre: req.body.genre,
-                first_published: req.body.first_published,
-                errors: error.errors,
-                heading: "New Book Missing Info"
-            })
-        } else {
-            throw error;
-        }
+            if(error.name === "SequelizeValidationError") {
+                res.render("new_book", {
+                    title: req.body.title,
+                    author: req.body.author,
+                    genre: req.body.genre,
+                    first_published: req.body.first_published,
+                    errors: error.errors,
+                    heading: "New Book Missing Info"
+                })
+            }else if(error.name === "SequelizeUniqueConstraintError"){
+                res.render("new_book", {
+                    title: req.body.title,
+                    author: req.body.author,
+                    genre: req.body.genre,
+                    first_published: req.body.first_published,
+                    errors: error.errors,
+                    heading: "That Book seems to be already in our system"
+                })
+            } else {
+                throw error;
+            }
+
     }).catch((error) => {
             res.status(500).send(error);
             console.log(error)
@@ -103,7 +113,10 @@ router.get('/:id', (req, res) =>{
         ],
         include: [{
             model: Patron
-        }],
+        },
+            {
+                model: Book}
+        ],
     });
 
     Promise.all([getBook, getLoans])

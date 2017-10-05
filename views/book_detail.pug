@@ -19,27 +19,6 @@ block content
                 input#first_published(type='text', name="first_published" value=book.first_published)
             p
                 input(type='submit', value='Update')
-        if loans
-            h2 Loan History
-            table
-                thead
-                    tr
-                        th Book
-                        th Patron
-                        th Loaned on
-                        th Return by
-                        th Returned on
-                        th Action
-                tbody
-                    each loan in loans
-                        tr
-                            td
-                                a(href='book_detail.html') #{book.title}
-                            td
-                                a(href='patron_detail.html') #{loan.Patron.first_name} #{loan.Patron.last_name}
-                            td #{loan.loaned_on}
-                            td #{loan.return_by}
-                            td #{loan.returned_on}
-                            td
-                                if(!loan.returned_on)
-                                    a.button(href='return_book.html') Return Book
+    if loans
+        include loan_history
+

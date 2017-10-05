@@ -14,4 +14,33 @@ router.get('/', function(req, res) {
     });
 });
 
+/* GET details of patron */
+router.get('/:id', (req, res) =>{
+    const getPatron = Patron.findOne({
+        where: [
+            { id: req.params.id }
+        ]
+    });
+
+    const getLoans = Loan.findAll({
+        where: [
+            { patron_id: req.params.id }
+        ],
+        include: [{
+            model: Patron
+        },
+            {
+        model: Book}
+        ],
+    });
+
+    Promise.all([getPatron, getLoans])
+        .then(results => {
+            res.render('patron_detail', {
+                patron: results[0],
+                loans: results[1],
+            });
+        });
+});
+
 module.exports = router;

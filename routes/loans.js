@@ -15,7 +15,7 @@ router.get('/', function(req, res) {
     }).then((loan) => {
         res.render('all_loans', {
             loans: loan,
-            title: 'Loans'
+            heading: 'Loans'
         });
     });
 });
@@ -34,7 +34,7 @@ router.get('/checked_loans', function(req, res) {
     }).then((loan) => {
         res.render('all_loans', {
             loans: loan,
-            title: 'Checked Loans'
+            heading: 'Checked Loans'
         });
     });
 });
@@ -56,7 +56,7 @@ router.get('/overdue_loans', function(req, res) {
     }).then((loan) => {
         res.render('all_loans', {
             loans: loan,
-            title: 'Overdue Loans'
+            heading: 'Overdue Loans'
         });
     });
 });
