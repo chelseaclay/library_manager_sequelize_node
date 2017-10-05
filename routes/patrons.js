@@ -43,4 +43,42 @@ router.get('/:id', (req, res) =>{
         });
 });
 
+/* UPDATE details of patrons */
+router.post('/:id/update', (req, res) =>{
+    const getPatron = Patron.findOne({
+        where: [
+            { id: req.params.id }
+        ]
+    });
+    const getLoans = Loan.findAll({
+        where: [
+            { patron_id: req.params.id }
+        ],
+        include: [{
+            model: Patron
+        },{
+            model: Book
+        }],
+    });
+
+    Promise.all([getPatron, getLoans]).then(results => {
+        Patron.update(req.body, {
+            where: [{id: req.params.id}]
+        }).then((patron) => {
+            res.redirect('/patrons');
+        }).catch(function(error){
+            if(error.name === "SequelizeValidationError") {
+                res.render('patron_detail', {
+                    patron: results[0],
+                    loans: results[1],
+                    errors: error.errors
+                });
+            } else {
+                res.status(500).send(error);
+            }
+        })
+
+    });
+});
+
 module.exports = router;
