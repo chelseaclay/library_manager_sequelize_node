@@ -1,3 +1,4 @@
+"use strict";
 var express = require('express');
 var router = express.Router();
 const moment = require('moment');
@@ -95,7 +96,8 @@ router.get('/:id', (req, res) =>{
         }],
     });
 
-    Promise.all([getBook, getLoans]).then(results => {
+    Promise.all([getBook, getLoans])
+        .then(results => {
         res.render('book_detail', {
             book: results[0],
             loans: results[1]
@@ -104,13 +106,12 @@ router.get('/:id', (req, res) =>{
 });
 
 /* UPDATE details of book */
-router.put('/:id', (req, res) =>{
+router.post('/:id/update', (req, res) =>{
     const getBook = Book.findOne({
         where: [
             { id: req.params.id }
         ]
     });
-
     const getLoans = Loan.findAll({
         where: [
             { book_id: req.params.id }
@@ -121,10 +122,24 @@ router.put('/:id', (req, res) =>{
     });
 
     Promise.all([getBook, getLoans]).then(results => {
-        res.render('book_detail', {
-            book: results[0],
-            loans: results[1]
-        });
+        Book.update(req.body, {
+            where: [{id: req.params.id}]
+        }).then((book) => {
+            res.redirect('/books');
+        }).catch(function(error){
+            if(error.name === "SequelizeValidationError") {
+                let book = Book.build(req.body);
+                book.id = req.params.id;
+                res.render('book_detail', {
+                    book: results[0],
+                    loans: results[1],
+                    errors: error.errors
+                });
+            } else {
+                res.status(500).send(error);
+            }
+        })
+
     });
 });
 
