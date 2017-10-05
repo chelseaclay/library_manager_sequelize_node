@@ -78,8 +78,33 @@ router.post('/new_book', (req, res, next) =>{
         })
 
 });
-/* GET details of book */ //TODO ADD LOAN DETAILS
+/* GET details of book */
 router.get('/:id', (req, res) =>{
+    const getBook = Book.findOne({
+        where: [
+            { id: req.params.id }
+        ]
+    });
+
+    const getLoans = Loan.findAll({
+        where: [
+            { book_id: req.params.id }
+        ],
+        include: [{
+            model: Patron
+        }],
+    });
+
+    Promise.all([getBook, getLoans]).then(results => {
+        res.render('book_detail', {
+            book: results[0],
+            loans: results[1]
+        });
+    });
+});
+
+/* UPDATE details of book */
+router.put('/:id', (req, res) =>{
     const getBook = Book.findOne({
         where: [
             { id: req.params.id }
