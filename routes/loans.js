@@ -84,8 +84,9 @@ router.get('/new_loan', function(req, res, next) {
                 loanedBooks.push(loan.book_id)
             });
             books.forEach(function(book) {
-                if (loanedBooks.indexOf(book.id) < 0) {
+                if (loanedBooks.indexOf(book.id) === -1) {
                     availableBooks.push(book);
+                    console.log(availableBooks.length)
                 }
             });
 
@@ -125,60 +126,9 @@ router.post('/new_loan', function(req, res, next) {
             }
         })
         .catch(function(error) {
-            console.log('Error: ' + error);
             res.status(500).send(error);
         });
 });
-/*router.post('/new_loan', (req, res, next) =>{
-    const allBooks = [];
-    const availableBooks = [];
-    Book.findAll().then(books =>{
-        allBooks = books;
-    })
-    Loan.create(req.body)
-        .then((loan) =>{
-            res.redirect("../loans");
-        }).catch((error) => {
-
-
-
-        const getPatrons = Patron.findAll();
-
-
-        Promise.all([getBooks, getPatrons])
-            .then(results => {
-                if(error.name === "SequelizeValidationError") {
-                    res.render("new_loan", {
-                        books: results[0],
-                        patrons: results[1],
-                        errors: error.errors,
-                        heading: "New Loan Missing Info",
-                        book_id: req.body.book_id,
-                        loaned_on: req.body.loaned_on,
-                        return_by: req.body.return_by
-                    })
-                }else if(error.name === "SequelizeUniqueConstraintError"){
-                    res.render("new_loan", {
-                        books: results[0],
-                        patrons: results[1],
-                        errors: error.errors,
-                        heading: "New Loan Missing Info 2",
-                        loaned_on: req.body.loaned_on,
-                        return_by: req.body.return_by
-                    })
-                } else {
-                    res.status(500).send(error);
-                }
-            });
-
-
-
-
-    }).catch((error) => {
-        res.status(500).send(error);
-    })
-
-});*/
 
 
 module.exports = router;

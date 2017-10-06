@@ -23,22 +23,22 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         loaned_on: {
-            type: DataTypes.DATE,
+            type: DataTypes.INTEGER,
             validate: {
                 notEmpty: {
-                    msg: "loaned on is required"
+                    msg: 'Loan date is required.'
                 }
             }
         },
         return_by: {
-            type: DataTypes.DATE,
+            type: DataTypes.INTEGER,
             validate: {
                 notEmpty: {
-                    msg: "returned on is required"
+                    msg: 'return date is required.'
                 }
             }
         },
-        returned_on: DataTypes.DATE,
+        returned_on: DataTypes.INTEGER,
     });
 
     Loan.associate = function(models) {
