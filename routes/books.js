@@ -176,22 +176,27 @@ router.get('/:id/return', (req, res) =>{
     }).then((loan) => {
             res.render('return_book', {
                 loan: loan,
-                returned_on: moment(new Date()).format("YYYY-MM-DD"),
+                returned_on: moment().format("YYYY-MM-DD"),
                 heading: "Return Book"
             });
     });
 });
 
-/* UPDATE returned book */
+/* UPDATE returned book if date is added and valid */
 router.post('/:id/return', (req, res, next) => {
-    const errors = [];
-    if (!req.body.returned_on) {
-        errors.push('Please add a returned on date!');
+    let errors = [];
+    let returned_on = req.body.returned_on;
+    let today = moment().format("YYYY-MM-DD");
+    if(!returned_on){
+        errors.push('You need to add a date. How about today?')
+    }else if(returned_on > today){
+        errors.push('That\'s not a valid date. How about today?');
     }
-    if (errors.length > 0) {
-        const returned_on = moment().format("YYYY-MM-D");
+    if(errors.length > 0){
         Loan.findOne({
-            where: [{ book_id: req.params.id }],
+            where: [
+                { book_id: req.params.id }
+            ],
             include: [
                 { model: Patron },
                 { model: Book }
@@ -199,16 +204,21 @@ router.post('/:id/return', (req, res, next) => {
         }).then((loan) => {
             res.render('return_book', {
                 loan: loan,
-                errors: errors,
-                heading: "looks like you forgot the return date"
+                returned_on: today,
+                heading: "Return Book",
+                errors: errors
             });
         });
-    } else {
-        // update the loan as returned
-        Loan.update(req.body, { where: [{ book_id: req.params.id }] }).then(() => {
-            res.redirect('/loans');
-        })
+    }else{
+        Loan.update(req.body, { where: [{ book_id: req.params.id }] })
+            .then((loan) => {
+                res.redirect('/loans')
+
+            })
     }
+
+
+
 });
 
 module.exports = router;
