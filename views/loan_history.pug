@@ -1,4 +1,3 @@
-h2 Loan History
 table
     thead
         tr
@@ -20,4 +19,4 @@ table
                 td #{loan.returned_on}
                 td
                     if(!loan.returned_on)
-                        a.button(href='../books/return_book') Return Book
+                        a.button(href=`../books/${loan.Book.id}/return`) Return Book

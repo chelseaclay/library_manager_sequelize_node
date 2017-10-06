@@ -61,7 +61,7 @@ router.get('/overdue_loans', function(req, res) {
         });
     });
 });
-/* GET new loan form */
+// GET new loan form
 router.get('/new_loan', function(req, res, next) {
     const getBooks = Book.findAll();
     const getPatrons = Patron.findAll();
@@ -101,9 +101,8 @@ router.get('/new_loan', function(req, res, next) {
             });
         });
 });
-/* ADD new loan to the database */
+// ADD new loan to the database
 router.post('/new_loan', function(req, res, next) {
-    console.log(req.body)
     Loan.create(req.body)
         .then(() =>{
             res.redirect('/loans');
@@ -130,21 +129,6 @@ router.post('/new_loan', function(req, res, next) {
         .catch(function(error) {
             res.status(500).send(error);
         });
-});
-
-/* GET return book  form */
-router.get('/return_book', function(req, res) {
-    Loan.findAll({
-        include: [
-            { model: Patron },
-            { model: Book }
-        ]
-    }).then((loan) => {
-        res.render('return_book', {
-            loans: loan,
-            heading: 'Return Book'
-        });
-    });
 });
 
 

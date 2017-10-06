@@ -2,10 +2,7 @@
 
 module.exports = function(sequelize, DataTypes) {
     const Loan = sequelize.define("Loan", {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true
-        },
+        id: DataTypes.INTEGER,
         book_id: {
             type: DataTypes.INTEGER,
             validate: {
@@ -23,22 +20,28 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         loaned_on: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DATE,
             validate: {
                 notEmpty: {
                     msg: 'Loan date is required.'
+                },
+                isDate: {
+                    msg: 'Loan date must be a date.'
                 }
             }
         },
         return_by: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DATE,
             validate: {
                 notEmpty: {
                     msg: 'return date is required.'
+                },
+                isDate: {
+                    msg: 'return date must be a date.'
                 }
             }
         },
-        returned_on: DataTypes.INTEGER,
+        returned_on: DataTypes.DATE,
     });
 
     Loan.associate = function(models) {
