@@ -1,3 +1,4 @@
+"use strict";
 var express = require('express');
 var router = express.Router();
 const moment = require('moment');
@@ -61,16 +62,10 @@ router.get('/overdue_loans', function(req, res) {
     });
 });
 /* ADD new loan form */
-router.get('/new_loan', (req, res) =>{
-    const getBook = Book.findAll({
-        include: [
-            { model: Loan }
-        ]
-
-    });
+/*router.get('/new_loan', (req, res) =>{
+    const getBooks = Book.findAll();
     const getPatrons = Patron.findAll();
-
-    Promise.all([getBook, getPatrons])
+    Promise.all([getBooks, getPatrons])
         .then(results => {
             res.render('new_loan', {
                 books: results[0],
@@ -80,42 +75,133 @@ router.get('/new_loan', (req, res) =>{
                 return_by: moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD"),
             });
         });
-
-});
+});*/
 /* ADD new loan - checks for errors carries over values to new rendered page */
-router.post('/new_loan', (req, res, next) =>{
+router.get('/new_loan', function(req, res, next) {
+    var allBooks = [];
+    var allPatrons = [];
+    var booksNotReturned = [];
+    var availableBooks =[];
+
+    Patron.findAll().then(function(patrons) {
+        allPatrons = patrons;
+
+        //Find all available books, all loaned books should be filtered
+        Book.findAll({})
+            .then(function(books) {
+                allBooks = books;
+                Loan.findAll({
+                    attribute: ['book_id'],
+                    where: {
+                        returned_on: null
+                    }
+                }).then(function(loans){
+                    loans.forEach(function(loan){
+                        booksNotReturned.push(loan.book_id)
+                    });
+                    books.forEach(function(book) {
+                        if (booksNotReturned.indexOf(book.id) < 0) {
+                            availableBooks.push(book);
+                        }
+                    }, this);
+                })
+                    .then(function() {
+                        res.render('new_loan', {
+                            loan: Loan.build(),
+                            books: availableBooks,
+                            patrons: allPatrons,
+                            loaned_on: moment(new Date()).format("YYYY-MM-DD"),
+                            return_by: moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD"),
+                            heading: 'New Loan'
+                        });
+                    });
+            });
+    });
+});
+router.post('/new_loan', function(req, res, next) {
+    // console.log(req.body);
+    Loan
+        .create(req.body)
+        .then(function() {
+            res.redirect('/loans');
+        })
+        .catch(function(error) {
+            if (error.name === 'SequelizeValidationError') {
+                res.render('new_loan', {
+                    errors: error.errors,
+                    heading: "New Book Missing Info",
+                    loaned_on: req.body.loaned_on,
+                    return_by: req.body.return_by
+                    //path: '../loans/'
+                });
+            }else if (error.name === 'SequelizeUniqueConstraintError') {
+                res.render('new_loan', {
+                    errors: error.errors,
+                    heading: "That Book seems to be already in our system",
+                    loaned_on: req.body.loaned_on,
+                    return_by: req.body.return_by
+
+                    //path: '../loans/'
+                });
+            }  else {
+                throw error;
+            }
+        })
+        .catch(function(err) {
+            console.log('Error: ' + err);
+            res.status(500).send(err);
+        });
+});
+/*router.post('/new_loan', (req, res, next) =>{
+    const allBooks = [];
+    const availableBooks = [];
+    Book.findAll().then(books =>{
+        allBooks = books;
+    })
     Loan.create(req.body)
         .then((loan) =>{
             res.redirect("../loans");
         }).catch((error) => {
-        if(error.name === "SequelizeValidationError") {
-            res.render("new_loan", {
-                book_id: req.body.book_id,
-                title: req.body.title,
-                patron_id: req.body.patron_id,
-                loaned_on: req.body.loaned_on,
-                return_by: req.body.return_by,
-                errors: error.errors,
-                heading: "New Loan Missing Info"
-            })
-        }else if(error.name === "SequelizeUniqueConstraintError"){
-            res.render("new_loan", {
-                book_id: req.body.book_id,
-                patron_id: req.body.patron_id,
-                loaned_on: req.body.loaned_on,
-                return_by: req.body.return_by,
-                errors: error.errors,
-                heading: "That Loan seems to be already in our system"
-            })
-        } else {
-            throw error;
-        }
+
+
+
+        const getPatrons = Patron.findAll();
+
+
+        Promise.all([getBooks, getPatrons])
+            .then(results => {
+                if(error.name === "SequelizeValidationError") {
+                    res.render("new_loan", {
+                        books: results[0],
+                        patrons: results[1],
+                        errors: error.errors,
+                        heading: "New Loan Missing Info",
+                        book_id: req.body.book_id,
+                        loaned_on: req.body.loaned_on,
+                        return_by: req.body.return_by
+                    })
+                }else if(error.name === "SequelizeUniqueConstraintError"){
+                    res.render("new_loan", {
+                        books: results[0],
+                        patrons: results[1],
+                        errors: error.errors,
+                        heading: "New Loan Missing Info 2",
+                        loaned_on: req.body.loaned_on,
+                        return_by: req.body.return_by
+                    })
+                } else {
+                    res.status(500).send(error);
+                }
+            });
+
+
+
 
     }).catch((error) => {
         res.status(500).send(error);
     })
 
-});
+});*/
 
 
 module.exports = router;

@@ -2,11 +2,42 @@
 
 module.exports = function(sequelize, DataTypes) {
     const Loan = sequelize.define("Loan", {
-        id: DataTypes.INTEGER,
-        book_id: DataTypes.INTEGER,
-        patron_id: DataTypes.INTEGER,
-        loaned_on: DataTypes.INTEGER,
-        return_by: DataTypes.DATE,
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true
+        },
+        book_id: {
+            type: DataTypes.INTEGER,
+            validate: {
+                notEmpty: {
+                    msg: "You must choose a book"
+                }
+            }
+        },
+        patron_id: {
+            type: DataTypes.INTEGER,
+            validate: {
+                notEmpty: {
+                    msg: "You must choose a patron"
+                }
+            }
+        },
+        loaned_on: {
+            type: DataTypes.DATE,
+            validate: {
+                notEmpty: {
+                    msg: "loaned on is required"
+                }
+            }
+        },
+        return_by: {
+            type: DataTypes.DATE,
+            validate: {
+                notEmpty: {
+                    msg: "returned on is required"
+                }
+            }
+        },
         returned_on: DataTypes.DATE,
     });
 
