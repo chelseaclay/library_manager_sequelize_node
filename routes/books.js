@@ -163,6 +163,52 @@ router.post('/:id/update', (req, res) =>{
 
     });
 });
+// Get return of book details
+router.get('/:id/return', (req, res) =>{
+    Loan.findOne({
+        where: [
+            { book_id: req.params.id }
+        ],
+        include: [
+            { model: Patron },
+            { model: Book }
+        ]
+    }).then((loan) => {
+            res.render('return_book', {
+                loan: loan,
+                returned_on: moment(new Date()).format("YYYY-MM-DD"),
+                heading: "Return Book"
+            });
+    });
+});
 
+/* UPDATE returned book */
+router.post('/:id/return', (req, res, next) => {
+    const errors = [];
+    if (!req.body.returned_on) {
+        errors.push('Please add a returned on date!');
+    }
+    if (errors.length > 0) {
+        const returned_on = moment().format("YYYY-MM-D");
+        Loan.findOne({
+            where: [{ book_id: req.params.id }],
+            include: [
+                { model: Patron },
+                { model: Book }
+            ]
+        }).then((loan) => {
+            res.render('return_book', {
+                loan: loan,
+                errors: errors,
+                heading: "looks like you forgot the return date"
+            });
+        });
+    } else {
+        // update the loan as returned
+        Loan.update(req.body, { where: [{ book_id: req.params.id }] }).then(() => {
+            res.redirect('/loans');
+        })
+    }
+});
 
 module.exports = router;

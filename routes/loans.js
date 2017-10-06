@@ -130,5 +130,20 @@ router.post('/new_loan', function(req, res, next) {
         });
 });
 
+/* GET return book  form */
+router.get('/return_book', function(req, res) {
+    Loan.findAll({
+        include: [
+            { model: Patron },
+            { model: Book }
+        ]
+    }).then((loan) => {
+        res.render('return_book', {
+            loans: loan,
+            heading: 'Return Book'
+        });
+    });
+});
+
 
 module.exports = router;
