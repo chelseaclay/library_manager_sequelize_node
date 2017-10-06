@@ -63,12 +63,10 @@ router.get('/overdue_loans', function(req, res) {
 });
 /* GET new loan form */
 router.get('/new_loan', function(req, res, next) {
-    let loanedBooks = [];
-    let availableBooks =[];
-
     const getBooks = Book.findAll();
     const getPatrons = Patron.findAll();
     const getLoans = Loan.findAll({
+        attribute: ['book_id'],
         where: {
             returned_on: null
         }
@@ -77,6 +75,10 @@ router.get('/new_loan', function(req, res, next) {
     //once all info has been got sort books to only show ones that haven't been loaned
     Promise.all([getBooks, getLoans, getPatrons])
         .then(results => {
+            let today = moment().format("YYYY-MM-DD");
+            let returnBy = moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD");
+            let loanedBooks = [];
+            let availableBooks =[];
             let books = results[0];
             let loans = results[1];
             let allPatrons = results[2];
@@ -84,9 +86,8 @@ router.get('/new_loan', function(req, res, next) {
                 loanedBooks.push(loan.book_id)
             });
             books.forEach(function(book) {
-                if (loanedBooks.indexOf(book.id) === -1) {
+                if (loanedBooks.indexOf(book.id) < 0) {
                     availableBooks.push(book);
-                    console.log(availableBooks.length)
                 }
             });
 
@@ -94,14 +95,15 @@ router.get('/new_loan', function(req, res, next) {
                 loans: loans,
                 books: availableBooks,
                 patrons: allPatrons,
-                loaned_on: moment(new Date()).format("YYYY-MM-DD"),
-                return_by: moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD"),
+                loaned_on: today,
+                return_by: returnBy,
                 heading: 'New Loan'
             });
         });
 });
 /* ADD new loan to the database */
 router.post('/new_loan', function(req, res, next) {
+    console.log(req.body)
     Loan.create(req.body)
         .then(() =>{
             res.redirect('/loans');
