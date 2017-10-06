@@ -10,12 +10,12 @@ block content
         p
             label(for='book_id') Book
             select#book_id(name='book_id')
-                each book, index in books
+                each book in books
                     option(value=book.id) #{book.title}
         p
             label(for='patron_id') Patron
             select#patron_id(name='patron_id')
-                each patron, index in patrons
+                each patron in patrons
                     option(value=patron.id) #{patron.first_name} #{patron.last_name}
         p
             label(for='loaned_on') Loaned on:

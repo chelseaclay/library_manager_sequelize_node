@@ -61,95 +61,72 @@ router.get('/overdue_loans', function(req, res) {
         });
     });
 });
-/* ADD new loan form */
-/*router.get('/new_loan', (req, res) =>{
+/* GET new loan form */
+router.get('/new_loan', function(req, res, next) {
+    let loanedBooks = [];
+    let availableBooks =[];
+
     const getBooks = Book.findAll();
     const getPatrons = Patron.findAll();
-    Promise.all([getBooks, getPatrons])
+    const getLoans = Loan.findAll({
+        where: {
+            returned_on: null
+        }
+    });
+
+    //once all info has been got sort books to only show ones that haven't been loaned
+    Promise.all([getBooks, getLoans, getPatrons])
         .then(results => {
+            let books = results[0];
+            let loans = results[1];
+            let allPatrons = results[2];
+            loans.forEach(function(loan){
+                loanedBooks.push(loan.book_id)
+            });
+            books.forEach(function(book) {
+                if (loanedBooks.indexOf(book.id) < 0) {
+                    availableBooks.push(book);
+                }
+            });
+
             res.render('new_loan', {
-                books: results[0],
-                patrons: results[1],
-                heading: 'New Loan',
+                loans: loans,
+                books: availableBooks,
+                patrons: allPatrons,
                 loaned_on: moment(new Date()).format("YYYY-MM-DD"),
                 return_by: moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD"),
+                heading: 'New Loan'
             });
         });
-});*/
-/* ADD new loan - checks for errors carries over values to new rendered page */
-router.get('/new_loan', function(req, res, next) {
-    var allBooks = [];
-    var allPatrons = [];
-    var booksNotReturned = [];
-    var availableBooks =[];
-
-    Patron.findAll().then(function(patrons) {
-        allPatrons = patrons;
-
-        //Find all available books, all loaned books should be filtered
-        Book.findAll({})
-            .then(function(books) {
-                allBooks = books;
-                Loan.findAll({
-                    attribute: ['book_id'],
-                    where: {
-                        returned_on: null
-                    }
-                }).then(function(loans){
-                    loans.forEach(function(loan){
-                        booksNotReturned.push(loan.book_id)
-                    });
-                    books.forEach(function(book) {
-                        if (booksNotReturned.indexOf(book.id) < 0) {
-                            availableBooks.push(book);
-                        }
-                    }, this);
-                })
-                    .then(function() {
-                        res.render('new_loan', {
-                            loan: Loan.build(),
-                            books: availableBooks,
-                            patrons: allPatrons,
-                            loaned_on: moment(new Date()).format("YYYY-MM-DD"),
-                            return_by: moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD"),
-                            heading: 'New Loan'
-                        });
-                    });
-            });
-    });
 });
+/* ADD new loan to the database */
 router.post('/new_loan', function(req, res, next) {
-    // console.log(req.body);
-    Loan
-        .create(req.body)
-        .then(function() {
+    Loan.create(req.body)
+        .then(() =>{
             res.redirect('/loans');
         })
-        .catch(function(error) {
+        .catch((error) =>{
             if (error.name === 'SequelizeValidationError') {
                 res.render('new_loan', {
                     errors: error.errors,
-                    heading: "New Book Missing Info",
+                    heading: "New Loan Missing Info",
                     loaned_on: req.body.loaned_on,
                     return_by: req.body.return_by
-                    //path: '../loans/'
                 });
             }else if (error.name === 'SequelizeUniqueConstraintError') {
                 res.render('new_loan', {
                     errors: error.errors,
-                    heading: "That Book seems to be already in our system",
+                    heading: "That loan seems to be already in our system",
                     loaned_on: req.body.loaned_on,
                     return_by: req.body.return_by
-
-                    //path: '../loans/'
                 });
             }  else {
                 throw error;
             }
         })
-        .catch(function(err) {
-            console.log('Error: ' + err);
-            res.status(500).send(err);
+        .catch(function(error) {
+            console.log('Error: ' + error);
+            res.status(500).send(error);
         });
 });
 /*router.post('/new_loan', (req, res, next) =>{
