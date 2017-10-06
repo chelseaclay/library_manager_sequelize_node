@@ -68,7 +68,7 @@ router.get('/new_book', (req, res) =>{
 /* ADD new book - checks for errors carries over values to new rendered page */
 router.post('/new_book', (req, res, next) =>{
     Book.create(req.body)
-        .then((book) =>{
+        .then(() =>{
             res.redirect("../books");
         }).catch((error) => {
             if(error.name === "SequelizeValidationError") {
@@ -147,9 +147,9 @@ router.post('/:id/update', (req, res) =>{
     Promise.all([getBook, getLoans]).then(results => {
         Book.update(req.body, {
             where: [{id: req.params.id}]
-        }).then((book) => {
+        }).then(() => {
             res.redirect('/books');
-        }).catch(function(error){
+        }).catch((error) =>{
             if(error.name === "SequelizeValidationError") {
                 res.render('book_detail', {
                     book: results[0],
@@ -211,9 +211,8 @@ router.post('/:id/return', (req, res, next) => {
         });
     }else{
         Loan.update(req.body, { where: [{ book_id: req.params.id }] })
-            .then((loan) => {
+            .then(() => {
                 res.redirect('/loans')
-
             })
     }
 
