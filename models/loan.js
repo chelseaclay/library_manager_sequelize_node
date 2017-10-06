@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         loaned_on: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             validate: {
                 notEmpty: {
                     msg: 'Loan date is required.'
@@ -31,7 +31,7 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         return_by: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             validate: {
                 notEmpty: {
                     msg: 'return date is required.'
@@ -41,7 +41,10 @@ module.exports = function(sequelize, DataTypes) {
                 }
             }
         },
-        returned_on: DataTypes.DATE,
+        returned_on: {
+            type: DataTypes.DATEONLY,
+            allowNull: true
+        }
     });
 
     Loan.associate = function(models) {

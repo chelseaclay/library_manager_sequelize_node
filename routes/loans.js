@@ -103,33 +103,65 @@ router.get('/new_loan', function(req, res, next) {
 });
 // ADD new loan to the database
 router.post('/new_loan', function(req, res, next) {
-    Loan.create(req.body)
-        .then(() =>{
-            res.redirect('/loans');
-        })
-        .catch((error) =>{
-            if (error.name === 'SequelizeValidationError') {
-                res.render('new_loan', {
-                    errors: error.errors,
-                    heading: "New Loan Missing Info",
-                    loaned_on: req.body.loaned_on,
-                    return_by: req.body.return_by
-                });
-            }else if (error.name === 'SequelizeUniqueConstraintError') {
-                res.render('new_loan', {
-                    errors: error.errors,
-                    heading: "That loan seems to be already in our system",
-                    loaned_on: req.body.loaned_on,
-                    return_by: req.body.return_by
-                });
-            }  else {
-                throw error;
-            }
-        })
-        .catch(function(error) {
-            res.status(500).send(error);
-        });
-});
+    const getBooks = Book.findAll();
+    const getPatrons = Patron.findAll();
+    const getLoans = Loan.findAll({
+        attribute: ['book_id'],
+        where: {
+            returned_on: null
+        }
+    });
 
+    //once all info has been got sort books to only show ones that haven't been loaned
+    Promise.all([getBooks, getLoans, getPatrons])
+        .then(results => {
+            let today = moment().format("YYYY-MM-DD");
+            let returnBy = moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD");
+            let loanedBooks = [];
+            let availableBooks = [];
+            let books = results[0];
+            let loans = results[1];
+            let allPatrons = results[2];
+            loans.forEach(function (loan) {
+                loanedBooks.push(loan.book_id)
+            });
+            books.forEach(function (book) {
+                if (loanedBooks.indexOf(book.id) < 0) {
+                    availableBooks.push(book);
+                }
+            });
+
+            res.render('new_loan', {
+                loans: loans,
+                books: availableBooks,
+                patrons: allPatrons,
+                loaned_on: today,
+                return_by: returnBy,
+                heading: 'New Loan'
+            });
+        }).then(results => {
+        Loan.create(req.body)
+            .then(() => {
+                res.redirect('/loans');
+            })
+            .catch((error, loans, availableBooks, allPatrons, today, returnBy) =>{
+                if (error.name === 'SequelizeValidationError') {
+                    res.render('new_loan', {
+                        errors: error.errors,
+                        loans: loans,
+                        books: availableBooks,
+                        patrons: allPatrons,
+                        loaned_on: today,
+                        return_by: returnBy,
+                        heading: "big problems"
+                    });
+                }
+            })
+            .catch(function (error) {
+                console.log('Error: ' + error);
+                res.status(500).send(error);
+            });
+    });
+});
 
 module.exports = router;
