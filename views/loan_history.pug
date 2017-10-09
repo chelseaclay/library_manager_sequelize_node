@@ -25,3 +25,6 @@ table
                 td
                     if(!loan.returned_on)
                         a.button(href=`../books/${loan.Book.id}/return`) Return Book
+if(pages.length > 1)
+    each page in pages
+        a(href=`?page=${page}`)= page
