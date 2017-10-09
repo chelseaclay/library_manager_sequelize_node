@@ -6,7 +6,7 @@ block content
         ul
             each error in errors
                 li= error.message
-    form(method='post', action='../patrons/new_patron')
+    form(method='post', action='/patrons/new_patron')
         p
             label(for='first_name') First Name
             input#first_name(type='text' name="first_name" value=first_name )

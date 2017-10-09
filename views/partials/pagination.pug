@@ -1,0 +1,4 @@
+if(pages.length > 1)
+    div.pagination
+        each page in pages
+            a(href=`?page=${page}` class=(page === currentPage ? "active" : undefined)) Page [ #{page} ]

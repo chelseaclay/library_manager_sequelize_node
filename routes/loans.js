@@ -8,6 +8,9 @@ const Patron = require('../models').Patron;
 const functions = require('../javascripts/functions');
 let amountToShow = 10;
 let pages = [];
+let today = moment().format("YYYY-MM-DD");
+let returnBy = moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD");
+
 
 /* GET all loans */
 router.get('/', function (req, res) {
@@ -111,80 +114,119 @@ router.get('/overdue_loans', function (req, res) {
 
 /* GET all loans ordered by Book Title */
 router.get('/book', function (req, res) {
-    Loan.findAll({
-        include: [
-            {model: Patron},
-            {model: Book}
-        ],
-        order: [[Book, 'title']]
-    }).then((loan) => {
-        res.render('all_loans', {
-            loans: loan,
-            heading: 'Loans'
+    Loan.findAll({}).then((loan) => {
+        pages = functions.getPagination(loan, pages, amountToShow);
+    }).then(() => {
+        Loan.findAll({
+            include: [
+                {model: Patron},
+                {model: Book}
+            ],
+            order: [[Book, 'title']],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        }).then((loan) => {
+            res.render('all_loans', {
+                loans: loan,
+                heading: 'Loans',
+                currentPage: req.query.page,
+                pages: pages
+            });
         });
     });
 });
 /* GET all loans ordered by Patron */
 router.get('/patron', function (req, res) {
-    Loan.findAll({
-        include: [
-            {model: Patron},
-            {model: Book}
-        ],
-        order: [[Patron, 'first_name']]
-    }).then((loan) => {
-        res.render('all_loans', {
-            loans: loan,
-            heading: 'Loans'
+    Loan.findAll({}).then((loan) => {
+        pages = functions.getPagination(loan, pages, amountToShow);
+    }).then(() => {
+        Loan.findAll({
+            include: [
+                {model: Patron},
+                {model: Book}
+            ],
+            order: [[Patron, 'first_name']],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        }).then((loan) => {
+            res.render('all_loans', {
+                loans: loan,
+                heading: 'Loans',
+                currentPage: req.query.page,
+                pages: pages
+            });
         });
     });
 });
 /* GET all loans ordered by Loaned on */
 router.get('/loanedOn', function (req, res) {
-    Loan.findAll({
-        include: [
-            {model: Patron},
-            {model: Book}
-        ],
-        order: [['loaned_on']]
-    }).then((loan) => {
-        res.render('all_loans', {
-            loans: loan,
-            heading: 'Loans'
+    Loan.findAll({}).then((loan) => {
+        pages = functions.getPagination(loan, pages, amountToShow);
+    }).then(() => {
+        Loan.findAll({
+            include: [
+                {model: Patron},
+                {model: Book}
+            ],
+            order: [['loaned_on']],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        }).then((loan) => {
+            res.render('all_loans', {
+                loans: loan,
+                heading: 'Loans',
+                currentPage: req.query.page,
+                pages: pages
+            });
         });
     });
 });
 /* GET all loans ordered by Return by */
 router.get('/returnBy', function (req, res) {
-    Loan.findAll({
-        include: [
-            {model: Patron},
-            {model: Book}
-        ],
-        order: [['return_by']]
-    }).then((loan) => {
-        res.render('all_loans', {
-            loans: loan,
-            heading: 'Loans'
+    Loan.findAll({}).then((loan) => {
+        pages = functions.getPagination(loan, pages, amountToShow);
+    }).then(() => {
+        Loan.findAll({
+            include: [
+                {model: Patron},
+                {model: Book}
+            ],
+            order: [['return_by']],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        }).then((loan) => {
+            res.render('all_loans', {
+                loans: loan,
+                heading: 'Loans',
+                currentPage: req.query.page,
+                pages: pages
+            });
         });
     });
 });
 /* GET all loans ordered by Returned on */
 router.get('/returned', function (req, res) {
-    Loan.findAll({
-        include: [
-            {model: Patron},
-            {model: Book}
-        ],
-        order: [['returned_on']]
-    }).then((loan) => {
-        res.render('all_loans', {
-            loans: loan,
-            heading: 'Loans'
+    Loan.findAll({}).then((loan) => {
+        pages = functions.getPagination(loan, pages, amountToShow);
+    }).then(() => {
+        Loan.findAll({
+            include: [
+                {model: Patron},
+                {model: Book}
+            ],
+            order: [['returned_on']],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        }).then((loan) => {
+            res.render('all_loans', {
+                loans: loan,
+                heading: 'Loans',
+                currentPage: req.query.page,
+                pages: pages
+            });
         });
     });
 });
-
 
 // GET new loan form
 router.get('/new_loan', function (req, res, next) {
@@ -200,8 +242,6 @@ router.get('/new_loan', function (req, res, next) {
     //once all info has been got sort books to only show ones that haven't been loaned
     Promise.all([getBooks, getLoans, getPatrons])
         .then(results => {
-            let today = moment().format("YYYY-MM-DD");
-            let returnBy = moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD");
             let loanedBooks = [];
             let availableBooks = [];
             let books = results[0];
@@ -244,8 +284,6 @@ router.post('/new_loan', function (req, res, next) {
         Promise.all([getBooks, getLoans, getPatrons])
             .then(results => {
                 if (error.name) {
-                    let today = moment().format("YYYY-MM-DD");
-                    let returnBy = moment(new Date().setDate(new Date().getDate() + 7)).format("YYYY-MM-DD");
                     let loanedBooks = [];
                     let availableBooks = [];
                     let books = results[0];
@@ -271,8 +309,6 @@ router.post('/new_loan', function (req, res, next) {
                 } else {
                     res.status(500).send(error);
                 }
-
-
             })
     });
 });

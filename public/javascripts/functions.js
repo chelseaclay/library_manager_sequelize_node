@@ -6,6 +6,6 @@ module.exports = {
             pages.push(i);
         }
         return pages;
-    },
+    }
 
 };

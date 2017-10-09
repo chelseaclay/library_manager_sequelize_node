@@ -3,12 +3,12 @@ extends layout
 block content
     h1 #{heading}
     p
-        a.button(href='../loans/new_loan') Create New Loan
+        a.button(href='/loans/new_loan') Create New Loan
     p
         | Filters
-        a(href='../loans')  All
+        a(href='/loans')  All
         |
-        a(href='../loans/overdue_loans')  Overdue
+        a(href='/loans/overdue_loans')  Overdue
         |
-        a(href='../loans/checked_loans')  Checked Out
+        a(href='/loans/checked_loans')  Checked Out
     include loan_history

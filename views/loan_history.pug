@@ -2,29 +2,27 @@ table
     thead
         tr
             th
-                a(href='../loans/book') Book
+                a(href='/loans/book') Book
             th
-                a(href='../loans/patron') Patron
+                a(href='/loans/patron') Patron
             th
-                a(href='../loans/loanedOn') Loaned on
+                a(href='/loans/loanedOn') Loaned on
             th
-                a(href='../loans/returnBy') Return by
+                a(href='/loans/returnBy') Return by
             th
-                a(href='../loans/returned') Returned on
+                a(href='/loans/returned') Returned on
             th Action
     tbody
         each loan in loans
             tr
                 td
-                    a(href=`../books/${loan.Book.id}`) #{loan.Book.title}
+                    a(href=`/books/${loan.Book.id}`) #{loan.Book.title}
                 td
-                    a(href=`../patrons/${loan.Patron.id}`) #{loan.Patron.first_name} #{loan.Patron.last_name}
+                    a(href=`/patrons/${loan.Patron.id}`) #{loan.Patron.first_name} #{loan.Patron.last_name}
                 td #{loan.loaned_on}
                 td #{loan.return_by}
                 td #{loan.returned_on}
                 td
                     if(!loan.returned_on)
-                        a.button(href=`../books/${loan.Book.id}/return`) Return Book
-if(pages.length > 1)
-    each page in pages
-        a(href=`?page=${page}`)= page
+                        a.button(href=`/books/${loan.Book.id}/return`) Return Book
+include partials/pagination

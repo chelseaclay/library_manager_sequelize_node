@@ -3,8 +3,8 @@ extends layout
 block content
     h1 #{heading}
     p
-        a.button(href='../patrons/new_patron') Create New Patron
-    form.search(method='get', action='../patrons/search')
+        a.button(href='/patrons/new_patron') Create New Patron
+    form.search(method='get', action='/patrons/search')
         p
             input#search(type='search', name='search', placeholder='Search first name, last name, or library id', aria-label='Search' value=search)
             input(type='submit', value='Search')
@@ -20,7 +20,7 @@ block content
             each patron in patrons
                 tr
                     td
-                        a(href=`../patrons/${patron.id}`) #{patron.first_name} #{patron.last_name}
+                        a(href=`/patrons/${patron.id}`) #{patron.first_name} #{patron.last_name}
                     td #{patron.address}
                     td #{patron.email}
                     td #{patron.library_id}

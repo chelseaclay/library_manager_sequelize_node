@@ -6,7 +6,7 @@ block content
         ul
             each error in errors
                 li= error.message
-    form(method='post', action='../books/new_book')
+    form(method='post', action='/books/new_book')
         p
             label(for='title') Title
             input#title(type='text' name='title', value=title)

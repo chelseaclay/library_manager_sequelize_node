@@ -12,11 +12,11 @@ block content
 
     p
         | Filters
-        a(href='../books')  All
+        a(href='/books')  All
         |
-        a(href='../books/overdue_books')  Overdue
+        a(href='/books/overdue_books')  Overdue
         |
-        a(href='../books/checked_books')  Checked Out
+        a(href='/books/checked_books')  Checked Out
     table
         thead
             tr
@@ -28,12 +28,10 @@ block content
             each book in books
                 tr
                     td
-                        a(href=`../books/${book.id}`) #{book.title}
+                        a(href=`/books/${book.id}`) #{book.title}
                     td #{book.author}
                     td #{book.genre}
                     td #{book.first_published}
 
-    if(pages.length > 1)
-        each page in pages
-            a(href=`?page=${page}`)= page
+    include partials/pagination
 

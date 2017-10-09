@@ -92,3 +92,22 @@ input {
 input[type=text], select {
   margin-left: 10px;
 }
+#search {
+  width:400px;
+}
+.search input[type=submit] {
+  margin-left: 10px;
+}
+.pagination{
+  margin-left:20px;
+  color:black;
+  max-width: inherit;
+  margin-top: 10px;
+}
+.pagination a{
+  margin-right:20px;
+  color: #019875;
+}
+.pagination a:hover, .pagination a.active{
+  color:black;
+}
