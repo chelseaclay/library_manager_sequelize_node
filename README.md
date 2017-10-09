@@ -33,9 +33,6 @@ the app is served on port 3000
 
 ### Example Code
 ```javascript
-/*-----------------------------------------------------------------------------------
-Builds the small info Window
--------------------------------------------------------------------------------------*/
 router.get('/', function (req, res) {
     Loan.findAll().then((loan) => {
         pages = functions.getPagination(loan, pages, amountToShow);
