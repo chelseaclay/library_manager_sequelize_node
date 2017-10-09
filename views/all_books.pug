@@ -1,7 +1,7 @@
 extends layout
 
 block content
-    h1 #{title}
+    h1 #{heading}
     p
         a.button(href='../books/new_book') Create New Book
     p
@@ -27,5 +27,7 @@ block content
                     td #{book.genre}
                     td #{book.first_published}
 
-
+    if(pages.length > 1)
+        each page in pages
+            a(href=`?page=${page}`)= page
 
