@@ -11,24 +11,45 @@ let pages = [];
 
 /* GET all books */
 router.get('/', function (req, res) {
-    if (req.query.search !== undefined) {
-    Book.findAll({
-        where: {
-            $or: [
-                {
-                    title: { $like: '%' + req.query.search + '%' }
-                },
-                {
-                    author: { $like: '%' + req.query.search + '%' }
-                },
-                {
-                    genre: { $like: '%' + req.query.search + '%' }
-                }
-            ]
-        }
-    }).then((book) => {
-        pages = functions.getPagination(book, pages, amountToShow);
-    }).then(() => {
+        Book.findAll().then((book) => {
+            pages = functions.getPagination(book, pages, amountToShow);
+        }).then(() => {
+            Book.findAll({
+                order: [["first_published", "DESC"]],
+                limit: amountToShow,
+                offset: amountToShow * (parseInt(req.query.page) - 1)
+            })
+                .then((book) => {
+                    res.render('all_books', {
+                        books: book,
+                        heading: 'Books',
+                        currentPage: req.query.page,
+                        pages: pages
+                    });
+                });    })  ;
+
+
+
+});
+/* GET all books */
+router.get('/search', function (req, res) {
+        Book.findAll({
+            where: {
+                $or: [
+                    {
+                        title: { $like: '%' + req.query.search + '%' }
+                    },
+                    {
+                        author: { $like: '%' + req.query.search + '%' }
+                    },
+                    {
+                        genre: { $like: '%' + req.query.search + '%' }
+                    }
+                ]
+            }
+        }).then((book) => {
+            pages = functions.getPagination(book, pages, amountToShow);
+        }).then(() => {
             Book.findAll({
                 order: [["first_published", "DESC"]],
                 where: {
@@ -46,36 +67,15 @@ router.get('/', function (req, res) {
                 },
                 limit: amountToShow,
                 offset: amountToShow * (parseInt(req.query.page) - 1)
-            })
-                .then((book) => {
+            }).then((book) => {
                     res.render('all_books', {
                         books: book,
-                        heading: 'Books',
+                        heading: 'All Books for search of ' + req.query.search,
                         currentPage: req.query.page,
                         pages: pages
                     });
                 })
-    });
-        }else{
-        Book.findAll().then((book) => {
-            pages = functions.getPagination(book, pages, amountToShow);
-        }).then(() => {
-            Book.findAll({
-                order: [["first_published", "DESC"]],
-                limit: amountToShow,
-                offset: amountToShow * (parseInt(req.query.page) - 1)
-            })
-                .then((book) => {
-                    res.render('all_books', {
-                        books: book,
-                        heading: 'Books',
-                        currentPage: req.query.page,
-                        pages: pages
-                    });
-                });    })  ;
-        }
-
-
+        });
 });
 
 

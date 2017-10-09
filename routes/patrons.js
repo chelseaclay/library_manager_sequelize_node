@@ -17,6 +17,53 @@ router.get('/', (req, res) =>{
     });
 });
 
+/* GET patrons search */
+router.get('/search', function (req, res) {
+    Patron.findAll({
+        where: {
+            $or: [
+                {
+                    first_name: { $like: '%' + req.query.search + '%' }
+                },
+                {
+                    last_name: { $like: '%' + req.query.search + '%' }
+                },
+                {
+                    library_id: { $like: '%' + req.query.search + '%' }
+                }
+            ]
+        }
+    }).then((patron) => {
+        pages = functions.getPagination(patron, pages, amountToShow);
+    }).then(() => {
+        Patron.findAll({
+            order: [["first_name", "ASC"]],
+            where: {
+                $or: [
+                    {
+                        first_name: { $like: '%' + req.query.search + '%' }
+                    },
+                    {
+                        last_name: { $like: '%' + req.query.search + '%' }
+                    },
+                    {
+                        library_id: { $like: '%' + req.query.search + '%' }
+                    }
+                ]
+            },
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        }).then((patron) => {
+            res.render('all_patrons', {
+                patrons: patron,
+                heading: 'All Patrons for search of ' + req.query.search,
+                currentPage: req.query.page,
+                pages: pages
+            });
+        })
+    });
+});
+
 /* ADD new patron form */
 router.get('/new_patron', (req, res) =>{
     res.render('new_patron', {
