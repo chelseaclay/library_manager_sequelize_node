@@ -5,7 +5,7 @@ const moment = require('moment');
 const Book = require('../models').Book;
 const Loan = require('../models').Loan;
 const Patron = require('../models').Patron;
-const amountToShow = 10;
+const amountToShow = 5;
 let pages = [];
 
 function getPagination(list) {
@@ -166,13 +166,7 @@ router.post('/new_book', (req, res, next) => {
 });
 /* GET details of book */
 router.get('/:id', (req, res) => {
-    const getBook = Book.findOne({
-        where: [
-            {id: req.params.id}
-        ]
-    });
-
-    const getLoans = Loan.findAll({
+    Loan.findAll({
         where: [
             {book_id: req.params.id}
         ],
@@ -182,16 +176,41 @@ router.get('/:id', (req, res) => {
             {
                 model: Book
             }
-        ],
-    });
-
-    Promise.all([getBook, getLoans])
-        .then(results => {
-            res.render('book_detail', {
-                book: results[0],
-                loans: results[1]
-            });
+        ]
+    }).then((loan) => {
+        getPagination(loan);
+    }).then(() => {
+        const getBook = Book.findOne({
+            where: [
+                {id: req.params.id}
+            ]
         });
+
+        const getLoans = Loan.findAll({
+            where: [
+                {book_id: req.params.id}
+            ],
+            include: [{
+                model: Patron
+            },
+                {
+                    model: Book
+                }
+            ],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        });
+
+        Promise.all([getBook, getLoans])
+            .then(results => {
+                res.render('book_detail', {
+                    book: results[0],
+                    loans: results[1],
+                    currentPage: req.query.page,
+                    pages: pages
+                });
+            });
+    });
 });
 
 /* UPDATE details of book */

@@ -5,7 +5,7 @@ const moment = require('moment');
 const Book = require('../models').Book;
 const Loan = require('../models').Loan;
 const Patron = require('../models').Patron;
-const amountToShow = 10;
+const amountToShow = 5;
 let pages = [];
 
 function getPagination(list) {
@@ -68,7 +68,9 @@ router.get('/checked_loans', function (req, res) {
         }).then((loan) => {
             res.render('all_loans', {
                 loans: loan,
-                heading: 'Checked Loans'
+                heading: 'Checked Loans',
+                currentPage: req.query.page,
+                pages: pages
             });
         });
     });
@@ -106,7 +108,9 @@ router.get('/overdue_loans', function (req, res) {
         }).then((loan) => {
             res.render('all_loans', {
                 loans: loan,
-                heading: 'Overdue Loans'
+                heading: 'Overdue Loans',
+                currentPage: req.query.page,
+                pages: pages
             });
         });
     });
