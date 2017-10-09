@@ -8,5 +8,10 @@ module.exports = {
         return pages;
     },
 
-    
 };
+function search() {
+    let searchValue = document.getElementById('search').value;
+    window.location.href = '/books?search=' + searchValue;
+    console.log(searchValue)
+    return searchValue;
+}

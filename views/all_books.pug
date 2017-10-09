@@ -4,6 +4,11 @@ block content
     h1 #{heading}
     p
         a.button(href='../books/new_book') Create New Book
+    form.search
+    input.form-control(type='search', id="search" name='search', placeholder='Search book, author, genre ...', aria-label='Search')
+    button.btn.search(type='button', onclick='search()') Search
+    if(searchValue)
+        You searched for #{searchValue}
     p
         | Filters
         a(href='../books')  All
