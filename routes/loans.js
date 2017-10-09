@@ -5,21 +5,14 @@ const moment = require('moment');
 const Book = require('../models').Book;
 const Loan = require('../models').Loan;
 const Patron = require('../models').Patron;
-const amountToShow = 5;
+const functions = require('../javascripts/functions');
+let amountToShow = 10;
 let pages = [];
-
-function getPagination(list) {
-    pages = [];
-    let numPages = Math.ceil(list.length / amountToShow);
-    for (let i = 1; i <= numPages; i += 1) {
-        pages.push(i);
-    }
-}
 
 /* GET all loans */
 router.get('/', function (req, res) {
     Loan.findAll().then((loan) => {
-        getPagination(loan);
+        pages = functions.getPagination(loan, pages, amountToShow);
     }).then(() => {
         Loan.findAll({
             include: [
@@ -51,7 +44,7 @@ router.get('/checked_loans', function (req, res) {
             }
         }
     }).then((loan) => {
-        getPagination(loan);
+        pages = functions.getPagination(loan, pages, amountToShow);
     }).then(() => {
         Loan.findAll({
             include: [
@@ -92,7 +85,7 @@ router.get('/overdue_loans', function (req, res) {
         limit: amountToShow,
         offset: amountToShow * (parseInt(req.query.page) - 1)
     }).then((loan) => {
-        getPagination(loan);
+        pages = functions.getPagination(loan, pages, amountToShow);
     }).then(() => {
         Loan.findAll({
             include: [

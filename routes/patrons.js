@@ -3,16 +3,9 @@ var router = express.Router();
 const Book = require('../models').Book;
 const Loan = require('../models').Loan;
 const Patron = require('../models').Patron;
-const amountToShow = 10;
+const functions = require('../javascripts/functions');
+let amountToShow = 10;
 let pages = [];
-
-function getPagination(list) {
-    pages = [];
-    let numPages = Math.ceil(list.length / amountToShow);
-    for (let i = 1; i <= numPages; i += 1) {
-        pages.push(i);
-    }
-}
 
 /* GET all patrons */
 router.get('/', (req, res) =>{
@@ -82,7 +75,7 @@ router.get('/:id', (req, res) => {
             }
         ],
     }).then((loan) => {
-        getPagination(loan);
+        pages = functions.getPagination(loan, pages, amountToShow);
     }).then(() => {
         const getPatron = Patron.findOne({
             where: [

@@ -5,21 +5,13 @@ const moment = require('moment');
 const Book = require('../models').Book;
 const Loan = require('../models').Loan;
 const Patron = require('../models').Patron;
-const amountToShow = 5;
+const functions = require('../javascripts/functions');
+let amountToShow = 10;
 let pages = [];
-
-function getPagination(list) {
-    pages = [];
-    let numPages = Math.ceil(list.length / amountToShow);
-    for (let i = 1; i <= numPages; i += 1) {
-        pages.push(i);
-    }
-}
-
 /* GET all books */
 router.get('/', function (req, res) {
     Book.findAll().then((book) => {
-        getPagination(book);
+        pages = functions.getPagination(book, pages, amountToShow);
     }).then(() => {
         Book.findAll({
             order: [["first_published", "DESC"]],
@@ -53,7 +45,7 @@ router.get('/overdue_books', function (req, res) {
             }
         ]
     }).then((book) => {
-        getPagination(book);
+        pages = functions.getPagination(book, pages, amountToShow);
     }).then(() => {
         Book.findAll(
             {
@@ -96,7 +88,7 @@ router.get('/checked_books', function (req, res) {
             }
         ]
     }).then((book) => {
-        getPagination(book);
+        pages = functions.getPagination(book, pages, amountToShow);
     }).then(() => {
         Book.findAll({
             include: [
@@ -178,7 +170,7 @@ router.get('/:id', (req, res) => {
             }
         ]
     }).then((loan) => {
-        getPagination(loan);
+        pages = functions.getPagination(loan, pages, amountToShow);
     }).then(() => {
         const getBook = Book.findOne({
             where: [
