@@ -212,40 +212,76 @@ router.get('/:id', (req, res) => {
     });
 });
 /* UPDATE details of book */
-router.post('/:id/update', (req, res) => {
-    const getBook = Book.findOne({
-        where: [{
-            id: req.params.id
-        }]
-    });
-    const getLoans = Loan.findAll({
+router.post('/:id', (req, res) => {
+    Loan.findAll({
         where: [{
             book_id: req.params.id
         }],
         include: [{
             model: Patron
-        }],
-    });
+        }, {
+            model: Book
+        }]
+    }).then((loan) => {
+        pages = functions.getPagination(loan, pages, amountToShow);
+    }).then(() => {
+        const getBook = Book.findOne({
+            where: [{
+                id: req.params.id
+            }]
+        });
+        const getLoans = Loan.findAll({
+            where: [{
+                book_id: req.params.id
+            }],
+            include: [{
+                model: Patron
+            }, {
+                model: Book
+            }],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        });
+
     Promise.all([getBook, getLoans]).then(results => {
         Book.update(req.body, {
             where: [{
                 id: req.params.id
             }]
         }).then(() => {
-            res.redirect('/books');
+            res.redirect('../books');
         }).catch((error) => {
             if (error.name === "SequelizeValidationError") {
-                res.render('book_detail', {
+                res.render("book_detail", {
                     book: results[0],
                     loans: results[1],
-                    errors: error.errors
-                });
+                    errors: error.errors,
+                    heading: "Update Book Missing Info",
+                    currentPage: req.query.page,
+                    pages: pages
+                })
+            } else if (error.name) {
+                res.render("book_detail", {
+                    book: results[0],
+                    loans: results[1],
+                    errors: error.errors,
+                    heading: "Update Book duplication error",
+                    currentPage: req.query.page,
+                    pages: pages
+                })
             } else {
-                res.status(500).send(error);
+                throw error;
             }
+        }).catch((error) => {
+            res.status(500).send(error);
+            console.log(error)
         })
     });
-});
+});});
+
+
+
+
 // Get return of book details
 router.get('/:id/return', (req, res) => {
     Loan.findOne({
