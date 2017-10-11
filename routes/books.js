@@ -49,15 +49,12 @@ router.get('/search', function(req, res) {
                     $like: '%' + req.query.search + '%'
                 }
             }]
-        },
-        limit: amountToShow,
-        offset: amountToShow * (parseInt(req.query.page) - 1)
+        }
     }).then((book) => {
         res.render('all_books', {
             books: book,
             heading: 'All Books for search of ' + req.query.search,
-            currentPage: req.query.page,
-            pages: pages
+            pages: []
         });
     })
 });

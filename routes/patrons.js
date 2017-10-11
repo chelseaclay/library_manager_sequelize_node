@@ -33,15 +33,12 @@ router.get('/search', function (req, res) {
                     library_id: { $like: '%' + req.query.search + '%' }
                 }
             ]
-        },
-        limit: amountToShow,
-        offset: amountToShow * (parseInt(req.query.page) - 1)
+        }
     }).then((patron) => {
         res.render('all_patrons', {
             patrons: patron,
             heading: 'All Patrons for search of ' + req.query.search,
-            currentPage: req.query.page,
-            pages: pages
+            pages: []
         });
     })
 
