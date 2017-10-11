@@ -9,7 +9,7 @@ const functions = require('../javascripts/functions');
 let amountToShow = 10;
 let pages = [];
 /* GET all books */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     Book.findAll().then((book) => {
         pages = functions.getPagination(book, pages, amountToShow);
     }).then(() => {
@@ -30,7 +30,7 @@ router.get('/', function(req, res) {
     });
 });
 /* GET books search */
-router.get('/search', function(req, res) {
+router.get('/search', function (req, res) {
     Book.findAll({
         order: [
             ["first_published", "DESC"]
@@ -59,7 +59,7 @@ router.get('/search', function(req, res) {
     })
 });
 /* GET overdue books */
-router.get('/overdue_books', function(req, res) {
+router.get('/overdue_books', function (req, res) {
     Book.findAll({
         include: [{
             model: Loan,
@@ -96,7 +96,7 @@ router.get('/overdue_books', function(req, res) {
     });
 });
 /* GET checked out books */
-router.get('/checked_books', function(req, res) {
+router.get('/checked_books', function (req, res) {
     Book.findAll({
         include: [{
             model: Loan,
@@ -164,7 +164,6 @@ router.post('/new_book', (req, res, next) => {
         }
     }).catch((error) => {
         res.status(500).send(error);
-        console.log(error)
     })
 });
 /* GET details of book */
@@ -240,42 +239,41 @@ router.post('/:id', (req, res) => {
             offset: amountToShow * (parseInt(req.query.page) - 1)
         });
 
-    Promise.all([getBook, getLoans]).then(results => {
-        Book.update(req.body, {
-            where: [{
-                id: req.params.id
-            }]
-        }).then(() => {
-            res.redirect('../books');
-        }).catch((error) => {
-            if (error.name === "SequelizeValidationError") {
-                res.render("book_detail", {
-                    book: results[0],
-                    loans: results[1],
-                    errors: error.errors,
-                    heading: "Missing Info",
-                    currentPage: req.query.page,
-                    pages: pages
-                })
-            } else if (error.name === "SequelizeUniqueConstraintError") {
-                res.render("book_detail", {
-                    book: results[0],
-                    loans: results[1],
-                    errors: error.errors,
-                    heading: "Duplication error",
-                    currentPage: req.query.page,
-                    pages: pages
-                })
-            } else {
-                throw error;
-            }
-        }).catch((error) => {
-            res.status(500).send(error);
-        })
+        Promise.all([getBook, getLoans]).then(results => {
+            Book.update(req.body, {
+                where: [{
+                    id: req.params.id
+                }]
+            }).then(() => {
+                res.redirect('../books');
+            }).catch((error) => {
+                if (error.name === "SequelizeValidationError") {
+                    res.render("book_detail", {
+                        book: results[0],
+                        loans: results[1],
+                        errors: error.errors,
+                        heading: "Missing Info",
+                        currentPage: req.query.page,
+                        pages: pages
+                    })
+                } else if (error.name === "SequelizeUniqueConstraintError") {
+                    res.render("book_detail", {
+                        book: results[0],
+                        loans: results[1],
+                        errors: error.errors,
+                        heading: "Duplication error",
+                        currentPage: req.query.page,
+                        pages: pages
+                    })
+                } else {
+                    throw error;
+                }
+            }).catch((error) => {
+                res.status(500).send(error);
+            })
+        });
     });
-});});
-
-
+});
 
 
 // Get return of book details

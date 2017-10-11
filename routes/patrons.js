@@ -8,7 +8,7 @@ let amountToShow = 10;
 let pages = [];
 
 /* GET all patrons */
-router.get('/', (req, res) =>{
+router.get('/', (req, res) => {
     Patron.findAll().then((patron) => {
         res.render('all_patrons', {
             patrons: patron,
@@ -24,13 +24,13 @@ router.get('/search', function (req, res) {
         where: {
             $or: [
                 {
-                    first_name: { $like: '%' + req.query.search + '%' }
+                    first_name: {$like: '%' + req.query.search + '%'}
                 },
                 {
-                    last_name: { $like: '%' + req.query.search + '%' }
+                    last_name: {$like: '%' + req.query.search + '%'}
                 },
                 {
-                    library_id: { $like: '%' + req.query.search + '%' }
+                    library_id: {$like: '%' + req.query.search + '%'}
                 }
             ]
         }
@@ -45,18 +45,18 @@ router.get('/search', function (req, res) {
 });
 
 /* ADD new patron form */
-router.get('/new_patron', (req, res) =>{
+router.get('/new_patron', (req, res) => {
     res.render('new_patron', {
         heading: 'New Patron',
     });
 });
 /* ADD new patron - checks for errors carries over values to new rendered page */
-router.post('/new_patron', (req, res, next) =>{
+router.post('/new_patron', (req, res, next) => {
     Patron.create(req.body)
-        .then(() =>{
+        .then(() => {
             res.redirect("../patrons");
         }).catch((error) => {
-        if(error.name === "SequelizeValidationError") {
+        if (error.name === "SequelizeValidationError") {
             res.render("new_patron", {
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
@@ -67,7 +67,7 @@ router.post('/new_patron', (req, res, next) =>{
                 errors: error.errors,
                 heading: "New Patron Missing Info"
             })
-        }else if(error.name === "SequelizeUniqueConstraintError"){
+        } else if (error.name === "SequelizeUniqueConstraintError") {
             res.render("new_patron", {
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
@@ -138,7 +138,7 @@ router.get('/:id', (req, res) => {
 });
 
 /* UPDATE details of patrons */
-router.post('/:id', (req, res) =>{
+router.post('/:id', (req, res) => {
     Loan.findAll({
         where: [
             {patron_id: req.params.id}
@@ -174,41 +174,40 @@ router.post('/:id', (req, res) =>{
             offset: amountToShow * (parseInt(req.query.page) - 1)
         });
 
-    Promise.all([getPatron, getLoans]).then(results => {
-        Patron.update(req.body, {
-            where: [{id: req.params.id}]
-        }).then(() => {
-            res.redirect('/patrons');
-        }).catch(function (error) {
-            if (error.name === "SequelizeValidationError") {
-                res.render('patron_detail', {
-                    patron: results[0],
-                    loans: results[1],
-                    errors: error.errors,
-                    heading: "Validation error",
-                    currentPage: req.query.page,
-                    pages: pages
-                });
-            } else if (error.name === "SequelizeUniqueConstraintError") {
-                res.render("patron_detail", {
-                    book: results[0],
-                    loans: results[1],
-                    errors: error.errors,
-                    heading: "Duplication error",
-                    currentPage: req.query.page,
-                    pages: pages
-                })
-            }else {
-                res.status(500).send(error);
-            }
-        })
-            .catch((error) => {
-                res.status(500).send(error);
+        Promise.all([getPatron, getLoans]).then(results => {
+            Patron.update(req.body, {
+                where: [{id: req.params.id}]
+            }).then(() => {
+                res.redirect('/patrons');
+            }).catch(function (error) {
+                if (error.name === "SequelizeValidationError") {
+                    res.render('patron_detail', {
+                        patron: results[0],
+                        loans: results[1],
+                        errors: error.errors,
+                        heading: "Validation error",
+                        currentPage: req.query.page,
+                        pages: pages
+                    });
+                } else if (error.name === "SequelizeUniqueConstraintError") {
+                    res.render("patron_detail", {
+                        book: results[0],
+                        loans: results[1],
+                        errors: error.errors,
+                        heading: "Duplication error",
+                        currentPage: req.query.page,
+                        pages: pages
+                    })
+                } else {
+                    res.status(500).send(error);
+                }
             })
-    });
+                .catch((error) => {
+                    res.status(500).send(error);
+                })
+        });
     });
 });
-
 
 
 module.exports = router;
