@@ -256,16 +256,16 @@ router.post('/:id', (req, res) => {
                     book: results[0],
                     loans: results[1],
                     errors: error.errors,
-                    heading: "Update Book Missing Info",
+                    heading: "Missing Info",
                     currentPage: req.query.page,
                     pages: pages
                 })
-            } else if (error.name) {
+            } else if (error.name === "SequelizeUniqueConstraintError") {
                 res.render("book_detail", {
                     book: results[0],
                     loans: results[1],
                     errors: error.errors,
-                    heading: "Update Book duplication error",
+                    heading: "Duplication error",
                     currentPage: req.query.page,
                     pages: pages
                 })
@@ -274,7 +274,6 @@ router.post('/:id', (req, res) => {
             }
         }).catch((error) => {
             res.status(500).send(error);
-            console.log(error)
         })
     });
 });});

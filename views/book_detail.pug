@@ -2,9 +2,9 @@ extends layout
 
 block content
     if book
-        h1 Book: #{book.title}
+        h1 Book: #{book.title} #{heading}
         if errors
-            ul
+            ul.errors
                 each error in errors
                     li= error.message
         form(method='post' action=`/books/${book.id}`)

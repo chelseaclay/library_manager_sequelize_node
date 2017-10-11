@@ -2,8 +2,12 @@ extends layout
 
 block content
     if patron
-        h1 Patron: #{patron.first_name} #{patron.last_name}
-        form(method="post" action=`/patrons/${patron.id}/update`)
+        h1 Patron: #{patron.first_name} #{patron.last_name} #{heading}
+        if errors
+            ul.errors
+                each error in errors
+                    li= error.message
+        form(method="post" action=`/patrons/${patron.id}`)
             p
                 label(for='first_name') First Name
                 input#first_name(type='text', name="first_name" value=patron.first_name)

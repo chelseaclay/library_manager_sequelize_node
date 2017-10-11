@@ -141,40 +141,74 @@ router.get('/:id', (req, res) => {
 });
 
 /* UPDATE details of patrons */
-router.post('/:id/update', (req, res) =>{
-    const getPatron = Patron.findOne({
+router.post('/:id', (req, res) =>{
+    Loan.findAll({
         where: [
-            { id: req.params.id }
-        ]
-    });
-    const getLoans = Loan.findAll({
-        where: [
-            { patron_id: req.params.id }
+            {patron_id: req.params.id}
         ],
         include: [{
             model: Patron
-        },{
-            model: Book
-        }],
-    });
+        },
+            {
+                model: Book
+            }
+        ],
+    }).then((loan) => {
+        pages = functions.getPagination(loan, pages, amountToShow);
+    }).then(() => {
+        const getPatron = Patron.findOne({
+            where: [
+                {id: req.params.id}
+            ]
+        });
+
+        const getLoans = Loan.findAll({
+            where: [
+                {patron_id: req.params.id}
+            ],
+            include: [{
+                model: Patron
+            },
+                {
+                    model: Book
+                }
+            ],
+            limit: amountToShow,
+            offset: amountToShow * (parseInt(req.query.page) - 1)
+        });
 
     Promise.all([getPatron, getLoans]).then(results => {
         Patron.update(req.body, {
             where: [{id: req.params.id}]
         }).then(() => {
             res.redirect('/patrons');
-        }).catch(function(error){
-            if(error.name === "SequelizeValidationError") {
+        }).catch(function (error) {
+            if (error.name === "SequelizeValidationError") {
                 res.render('patron_detail', {
                     patron: results[0],
                     loans: results[1],
-                    errors: error.errors
+                    errors: error.errors,
+                    heading: "Validation error",
+                    currentPage: req.query.page,
+                    pages: pages
                 });
-            } else {
+            } else if (error.name === "SequelizeUniqueConstraintError") {
+                res.render("patron_detail", {
+                    book: results[0],
+                    loans: results[1],
+                    errors: error.errors,
+                    heading: "Duplication error",
+                    currentPage: req.query.page,
+                    pages: pages
+                })
+            }else {
                 res.status(500).send(error);
             }
         })
-
+            .catch((error) => {
+                res.status(500).send(error);
+            })
+    });
     });
 });
 
